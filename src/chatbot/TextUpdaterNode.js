@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack, Typography ,Grid} from '@mui/material';
 import { useCallback } from 'react';
 import { Handle, Position } from 'reactflow';
 
@@ -12,11 +12,18 @@ function TextUpdaterNode({ data, isConnectable }) {
   return (
     <Stack className="text-updater-node"  sx={{minHeight:'50px',minWidth:'200px'}}>
       <Handle type="target" position={Position.Left}  />
-      <div>
-      <Typography sx={{ color: 'lightgreen', fontSize: 'small' }} variant='body'>Send Message</Typography>
+      <Grid>
 
-       <Typography>{data?.label}</Typography>
-      </div>
+        <Grid sx={{backgroundColor:'lightblue'}} item>
+
+      <Typography sx={{  fontSize: 'small' }} variant='body'>Send Message</Typography>
+
+      </Grid>
+
+      <Typography variant="caption" display="block" >
+        {data?.label}
+      </Typography>
+      </Grid>
       <Handle
         type="source"
         position={Position.Right}
