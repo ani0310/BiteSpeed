@@ -1,23 +1,24 @@
 import { Grid, Stack,TextField } from '@mui/material';
-import { useCallback, useState } from 'react';
-import ReactFlow, { addEdge, useEdgesState, applyNodeChanges, Controls, Background, BackgroundVariant } from 'reactflow';
+import React,{ useCallback, useState } from 'react';
+import ReactFlow, { addEdge, useEdgesState, applyNodeChanges, Controls, Background, BackgroundVariant ,Handle} from 'reactflow';
 import { Button , Modal, Box, Typography} from '@mui/material';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 import 'reactflow/dist/style.css';
 import SettingsPannel from './SettingsPannel';
 
-const initialNodes = [
-  // { id: 'a', position: { x: 0, y: 0 }, data: { label: 'Node A' } },
-  // { id: 'b', position: { x: 0, y: 100 }, data: { label: 'Node B' } },
-];
+import TextUpdaterNode from './TextUpdaterNode.js';
 
-const initialEdges = [
-  // { id: 'a->b', type: 'custom-edge', source: 'a', target: 'b' },
-];
+import './text-updater-node.css';
+const nodeTypes = { textUpdater: TextUpdaterNode };
+
+
+
 
 export default function ChatbotFlow() {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { enqueueSnackbar } = useSnackbar();
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [message, setMessage] = useState("");
   const [inputMessage,setInputMessage]=useState("")
   const [idNum,setIdNum]=useState(0);
@@ -76,7 +77,10 @@ export default function ChatbotFlow() {
 
   const addNode = (node) => {
     console.log(node);
+    setInputMessage("")
+    
     setNodes([...nodes, node]);
+    setOpen(false)
   };
 
   const updateNodes=(node,id)=>{
@@ -97,42 +101,72 @@ export default function ChatbotFlow() {
 
   }
 
+  const handleSave=()=>{
+    const uniqueTarget=new Set();
+
+    edges.forEach((edg)=>{
+      uniqueTarget.add(edg.target);
+    })
+    if(uniqueTarget.size<nodes.length-1){
+      enqueueSnackbar("Form is not saved",{variant:'error'});
+      return;
+    }
+    enqueueSnackbar("Form is  saved",{variant:'success'});
+
+
+  }
+
+  
+
+ 
+
   return (
     <Stack sx={{ height: '100vh' }}>
+
+
        <Grid container  p={1} sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }} spacing={2}>
               <Grid item>
                 <Button variant="contained"
+                size="small"
                  onClick={
                   ()=>{
                   handleOpen()
                 }}>Add</Button>
               </Grid>
               <Grid item>
-                <Button variant="contained">Save</Button>
+                <Button variant="contained" size="small" onClick={()=>{
+                  handleSave()
+                }}>Save</Button>
               </Grid>
-            </Grid>
-      <Grid sx={{ height: '100%' }} container>
-        
-        <Grid xs={12} md={8} lg={10} item>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onEdgesDelete={onEdgesDelete}
-            fitView
-          >
-            <Background color="#ccc" variant={BackgroundVariant.Dots} />
-           
-            <Controls />
-          </ReactFlow>
         </Grid>
+      <Grid sx={{ height: '100%' }} container>
+        {/* nodespannel */}
+        <Grid xs={12} md={8} lg={10} item>
+        <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        onEdgeDelete={onEdgesDelete}
+        onConnect={onConnect}
+        
+        fitView
+    >
+      <Background color="#ccc" variant={BackgroundVariant.Dots} />
+      <Controls />
+
+    
+    </ReactFlow>
+        </Grid>
+        {/* settingspannel */}
         <Grid xs={12} md={4} lg={2} item>
           <SettingsPannel message={message} onUpdateNodes={updateNodes} seletedId={seletedId} />
         </Grid>
       </Grid>
 
+
+    {/* modal to add new message */}
 
       <>
       <Modal
@@ -143,24 +177,27 @@ export default function ChatbotFlow() {
       >
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
          
-              <TextField
+           <TextField
             size="small"
             id="addMessage"
             label="Add Message"
             variant="outlined"
             fullWidth
             value={inputMessage || ""}
-        onChange={(e) => {
-          setInputMessage(e?.target?.value);
-        }}
+            onChange={(e) => {
+              setInputMessage(e?.target?.value);
+            }}
       />
      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-          <Button onClick={()=>{
-        const node={ id: (idNum+""), position: { x: 100, y: 100 }, data: { label: inputMessage } }
+          <Button
+          size="small"
+          onClick={()=>{
+        const node={ id: (idNum+""), position: { x: 100, y: 100 },data: { label: inputMessage },type: 'textUpdater' }
         setIdNum(prev=>prev+1)
         addNode(node)
       }}  variant="contained" sx={{ ml: 2 }}>Add</Button>
-          <Button onClick={handleClose} variant="contained" sx={{ ml: 2 }}>Close Modal</Button>
+         <Button onClick={handleClose} variant="contained" color="error" sx={{ ml: 2 }} size="small">Cancel</Button>
+
         </Box>
         </Box>
       </Modal>

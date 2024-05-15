@@ -39,7 +39,7 @@ const SettingsPannel = ({onUpdateNodes,message,seletedId}) => {
     </Grid>
 
     <Grid item sx={{display:'flex',alignSelf:'flex-end'}}>
-      <Button variant="contained"  onClick={handleClick}>
+      <Button variant="contained" size="small" onClick={handleClick}>
         Update
       </Button>
     </Grid>
