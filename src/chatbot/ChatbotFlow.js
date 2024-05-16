@@ -1,8 +1,8 @@
 import { Grid, Stack,TextField } from '@mui/material';
 import React,{ useCallback, useState } from 'react';
-import ReactFlow, { addEdge, useEdgesState, applyNodeChanges, Controls, Background, BackgroundVariant ,Handle} from 'reactflow';
-import { Button , Modal, Box, Typography} from '@mui/material';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import ReactFlow, { addEdge, useEdgesState, applyNodeChanges, Controls, Background, BackgroundVariant } from 'reactflow';
+import { Button , Modal, Box} from '@mui/material';
+import {  useSnackbar } from 'notistack';
 
 import 'reactflow/dist/style.css';
 import SettingsPannel from './SettingsPannel';
@@ -28,14 +28,14 @@ export default function ChatbotFlow() {
 
   const getLabel=(id)=>{
     var ans=""
-    nodes.map((nod)=>{
-      if(nod.id==id) ans= nod?.data?.label
+    nodes.forEach((nod)=>{
+      if(nod.id===id) ans= nod?.data?.label
     })
     return ans;
   }
 
   const handleOpen = () => {
-    console.log("handleOpen")
+   
     setOpen(true);
   };
 
@@ -65,7 +65,7 @@ export default function ChatbotFlow() {
   );
 
   const onNodesChange = (changes) => {
-    console.log(changes[0], 'message1');
+    
     setMessage(getLabel(changes[0].id));
     setSelectedId(changes[0].id)
     setNodes((nds) => applyNodeChanges(changes, nds));
@@ -76,7 +76,7 @@ export default function ChatbotFlow() {
   };
 
   const addNode = (node) => {
-    console.log(node);
+    
     setInputMessage("")
     
     setNodes([...nodes, node]);
@@ -96,7 +96,7 @@ export default function ChatbotFlow() {
       }
       return el;
     });
-    console.log(updatedElements,'message4')
+    
     setNodes(updatedElements)
 
   }
@@ -126,15 +126,15 @@ export default function ChatbotFlow() {
 
        <Grid container  p={1} sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' }} spacing={2}>
               <Grid item>
-                <Button variant="contained"
+                <Button variant="outlined"
                 size="small"
                  onClick={
                   ()=>{
                   handleOpen()
-                }}>Add</Button>
+                }}>Add Message</Button>
               </Grid>
               <Grid item>
-                <Button variant="contained" size="small" onClick={()=>{
+                <Button variant="contained" size="small" color="success" onClick={()=>{
                   handleSave()
                 }}>Save</Button>
               </Grid>
@@ -175,7 +175,7 @@ export default function ChatbotFlow() {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: 500, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
          
            <TextField
             size="small"
@@ -192,7 +192,8 @@ export default function ChatbotFlow() {
           <Button
           size="small"
           onClick={()=>{
-        const node={ id: (idNum+""), position: { x: 100, y: 100 },data: { label: inputMessage },type: 'textUpdater' }
+            if(inputMessage==="") return;
+        const node={ id: (idNum+""), position: { x: 100+Math.floor(Math.random() * 100) + 1, y: 100+Math.floor(Math.random() * 100) + 1 },data: { label: inputMessage },type: 'textUpdater' }
         setIdNum(prev=>prev+1)
         addNode(node)
       }}  variant="contained" sx={{ ml: 2 }}>Add</Button>
