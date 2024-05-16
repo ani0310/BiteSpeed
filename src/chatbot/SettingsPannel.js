@@ -31,6 +31,7 @@ const SettingsPannel = ({onUpdateNodes,message,seletedId}) => {
       label="Update Message"
       variant="outlined"
       fullWidth
+      disabled={messageValue===""?true:false}
       value={messageValue || ""}
       onChange={(e) => {
         setValue(e?.target?.value);
